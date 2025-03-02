@@ -40,10 +40,14 @@ public class FilesServlet extends HttpServlet {
     }
 
     private List<FileInfo> parseFiles(Path path) throws IOException {
+
         List<FileInfo> filesInfo = new ArrayList<>();
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
             for (Path _path : stream) {
+
+                if (Files.isHidden(_path)) continue;
+
                 BasicFileAttributes attributes = Files.readAttributes(_path, BasicFileAttributes.class);
 
                 LocalDateTime fileTime = LocalDateTime.ofInstant(

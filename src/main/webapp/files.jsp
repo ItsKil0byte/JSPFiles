@@ -8,7 +8,9 @@
     ${time}
     <h1>${path}</h1>
     <hr>
-    <a href="files?path=${parent}">⬅️ Back</a>
+    <c:if test="${parent != null}">
+        <a href="files?path=${parent}">⬅️ Back</a>
+    </c:if>
     <table>
         <thead>
             <tr>
@@ -19,14 +21,34 @@
             <c:forEach var="file" items="${files}">
                 <tr>
                     <td>${file.directory ? "📁" : "📄"}</td>
-                    <td>${file.name}</td>
                     <td>
                         <c:choose>
-                            <c:when test="${file.directory}"> </c:when>
+                            <c:when test="${file.directory && parent == null}">
+                                <a href="files?path=${path}${file.name}">
+                                    ${file.name}
+                                </a>
+                            </c:when>
+                            <c:when test="${file.directory && parent != null}">
+                                <a href="files?path=${path}%5C${file.name}">
+                                    ${file.name}
+                                </a>
+                            </c:when>
+                            <c:when test="${!file.directory && parent == null}">
+                                <a href="download?path=${path}${file.name}">
+                                    ${file.name}
+                                </a>
+                            </c:when>
                             <c:otherwise>
-                              ${file.size} B
+                                <a href="download?path=${path}%5C${file.name}">
+                                    ${file.name}
+                                </a>
                             </c:otherwise>
                         </c:choose>
+                    </td>
+                    <td>
+                        <c:if test="${!file.directory}">
+                            ${file.size} B
+                        </c:if>
                     </td>
                     <td>${file.creationDate}</td>
                 </tr>
