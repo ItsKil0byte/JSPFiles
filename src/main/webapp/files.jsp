@@ -20,7 +20,14 @@
                 <tr>
                     <td>${file.directory ? "📁" : "📄"}</td>
                     <td>${file.name}</td>
-                    <td>${file.directory ? "" : file.size}</td>
+                    <td>
+                        <c:choose>
+                            <c:when test="${file.directory}"> </c:when>
+                            <c:otherwise>
+                              ${file.size} B
+                            </c:otherwise>
+                        </c:choose>
+                    </td>
                     <td>${file.creationDate}</td>
                 </tr>
             </c:forEach>

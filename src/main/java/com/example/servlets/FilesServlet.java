@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,10 +22,12 @@ import java.util.List;
 @WebServlet("/files")
 public class FilesServlet extends HttpServlet {
 
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        String currentTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"));
+        String currentTime = LocalDateTime.now().format(formatter);
         req.setAttribute("time", currentTime);
 
         Path path = Paths.get(req.getParameter("path"));
@@ -43,10 +46,15 @@ public class FilesServlet extends HttpServlet {
             for (Path _path : stream) {
                 BasicFileAttributes attributes = Files.readAttributes(_path, BasicFileAttributes.class);
 
+                LocalDateTime fileTime = LocalDateTime.ofInstant(
+                        attributes.creationTime().toInstant(),
+                        ZoneId.systemDefault()
+                );
+
                 filesInfo.add(new FileInfo(
                         _path.getFileName().toString(),
                         attributes.size(),
-                        attributes.creationTime().toString(),
+                        fileTime.format(formatter),
                         attributes.isDirectory()
                 ));
             }
