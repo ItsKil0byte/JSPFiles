@@ -29,7 +29,7 @@
                                 </a>
                             </c:when>
                             <c:when test="${file.directory && parent != null}">
-                                <a href="files?path=${path}%5C${file.name}">
+                                <a href="files?path=${path}/${file.name}">
                                     ${file.name}
                                 </a>
                             </c:when>
@@ -39,7 +39,7 @@
                                 </a>
                             </c:when>
                             <c:otherwise>
-                                <a href="download?path=${path}%5C${file.name}">
+                                <a href="download?path=${path}/${file.name}">
                                     ${file.name}
                                 </a>
                             </c:otherwise>
