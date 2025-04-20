@@ -7,6 +7,9 @@
 <body>
     ${time}
     <h1>${path}</h1>
+    <form action="logout" method="POST">
+        <button type="submit">Log out</button>
+    </form>
     <hr>
     <c:if test="${parent != null}">
         <a href="files?path=${parent}">⬅️ Back</a>
@@ -23,18 +26,8 @@
                     <td>${file.directory ? "📁" : "📄"}</td>
                     <td>
                         <c:choose>
-                            <c:when test="${file.directory && parent == null}">
-                                <a href="files?path=${path}${file.name}">
-                                    ${file.name}
-                                </a>
-                            </c:when>
-                            <c:when test="${file.directory && parent != null}">
+                            <c:when test="${file.directory}">
                                 <a href="files?path=${path}/${file.name}">
-                                    ${file.name}
-                                </a>
-                            </c:when>
-                            <c:when test="${!file.directory && parent == null}">
-                                <a href="download?path=${path}${file.name}">
                                     ${file.name}
                                 </a>
                             </c:when>

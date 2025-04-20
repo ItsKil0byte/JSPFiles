@@ -1,5 +1,6 @@
 package com.example.servlets;
 
+import com.example.accounts.UserProfile;
 import com.example.models.FileInfo;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -26,14 +27,34 @@ public class FilesServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        UserProfile userProfile = (UserProfile) req.getSession().getAttribute("user");
+
+        if (userProfile == null) {
+            resp.sendRedirect("login");
+            return;
+        }
+
+        String login = userProfile.getLogin();
+        String userPath = req.getParameter("path");
+
+        if (userPath == null || !userPath.startsWith("D:/tmp/filemanager/" + login)) {
+            resp.sendRedirect("files?path=D:/tmp/filemanager/" + login);
+            return;
+        }
+
+        Path path = Paths.get(userPath);
+        String parent = path.getParent().toString().replace("\\", "/");
+
+        if (parent.equals("D:/tmp/filemanager")) {
+            parent = null;
+        }
 
         String currentTime = LocalDateTime.now().format(formatter);
         req.setAttribute("time", currentTime);
 
-        Path path = Paths.get(req.getParameter("path"));
         List<FileInfo> files = parseFiles(path);
-        req.setAttribute("path", path);
-        req.setAttribute("parent", path.getParent());
+        req.setAttribute("path", path.toString().replace("\\", "/"));
+        req.setAttribute("parent", parent);
         req.setAttribute("files", files);
 
         req.getRequestDispatcher("files.jsp").forward(req, resp);
