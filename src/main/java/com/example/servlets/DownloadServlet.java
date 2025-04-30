@@ -1,6 +1,6 @@
 package com.example.servlets;
 
-import com.example.accounts.UserProfile;
+import com.example.models.UserProfile;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;

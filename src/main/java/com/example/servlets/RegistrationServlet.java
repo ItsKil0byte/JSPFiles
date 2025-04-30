@@ -1,7 +1,7 @@
 package com.example.servlets;
 
-import com.example.accounts.AccountService;
-import com.example.accounts.UserProfile;
+import com.example.database.DBService;
+import com.example.models.UserProfile;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -39,8 +39,8 @@ public class RegistrationServlet extends HttpServlet {
             return;
         }
 
-        AccountService accountService = (AccountService) getServletContext().getAttribute("accountService");
-        UserProfile userProfile = accountService.getUserByLogin(login);
+        DBService service = (DBService) getServletContext().getAttribute("service");
+        UserProfile userProfile = service.getUser(login);
 
         if (userProfile != null) {
             req.setAttribute("error", "This login is already used.");
@@ -50,7 +50,7 @@ public class RegistrationServlet extends HttpServlet {
 
         UserProfile newUser = new UserProfile(login, password);
         req.getSession().setAttribute("user", newUser);
-        accountService.addNewUser(newUser);
+        service.addNewUser(login, password);
 
         Files.createDirectories(Paths.get("D:/tmp/filemanager/" + login));
 

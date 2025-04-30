@@ -1,7 +1,7 @@
 package com.example.servlets;
 
-import com.example.accounts.AccountService;
-import com.example.accounts.UserProfile;
+import com.example.database.DBService;
+import com.example.models.UserProfile;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -37,8 +37,8 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        AccountService accountService = (AccountService) getServletContext().getAttribute("accountService");
-        UserProfile userProfile = accountService.getUserByLogin(login);
+        DBService service = (DBService) getServletContext().getAttribute("service");
+        UserProfile userProfile = service.getUser(login);
 
         if (userProfile == null) {
             req.setAttribute("error", "No such login.");
