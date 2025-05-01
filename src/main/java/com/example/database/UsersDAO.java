@@ -1,49 +1,32 @@
 package com.example.database;
 
-import com.example.executor.Executor;
 import com.example.models.UserProfile;
-
-import java.sql.Connection;
-import java.sql.SQLException;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+import org.hibernate.Session;
 
 public class UsersDAO {
-    private final Executor executor;
+    private final Session session;
 
-    public UsersDAO(Connection connection) {
-        this.executor = new Executor(connection);
+    public UsersDAO(Session session) {
+        this.session = session;
     }
 
-    public void createUserTable() throws SQLException {
-        executor.execUpdate("CREATE TABLE IF NOT EXISTS users (" +
-                            "id INT AUTO_INCREMENT PRIMARY KEY," +
-                            "login VARCHAR(50) UNIQUE NOT NULL," +
-                            "password VARCHAR(255) NOT NULL)"
-        );
+    public void insertUser(UserProfile user) {
+        session.persist(user);
     }
 
-    public void dropTable() throws SQLException {
-        executor.execUpdate("DROP TABLE users");
+    public UserProfile get(String login) {
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<UserProfile> query = builder.createQuery(UserProfile.class);
+        Root<UserProfile> root = query.from(UserProfile.class);
+        query.select(root).where(builder.equal(root.get("login"), login));
+
+        return session.createQuery(query).uniqueResult();
     }
 
-    public void insertUser(String login, String password) throws SQLException {
-        executor.execUpdate("INSERT INTO users (login, password) VALUES (?, ?)", login, password);
-    }
-
-    public int getUserId(String login) throws SQLException {
-        return executor.execQuery("SELECT * FROM users WHERE login = ?", resultSet -> {
-            if (!resultSet.next()) {
-                return -1;
-            }
-            return resultSet.getInt("id");
-        }, login);
-    }
-
-    public UserProfile get(String login) throws SQLException {
-        return executor.execQuery("SELECT * FROM users WHERE login = ?", resultSet -> {
-            if (!resultSet.next()) {
-                return null;
-            }
-            return new UserProfile(resultSet.getString("login"), resultSet.getString("password"));
-        }, login);
+    public UserProfile get(Long id) {
+        return session.get(UserProfile.class, id);
     }
 }

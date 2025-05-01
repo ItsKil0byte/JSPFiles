@@ -1,6 +1,6 @@
 package com.example.servlets;
 
-import com.example.database.DBService;
+import com.example.database.UserService;
 import com.example.models.UserProfile;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -17,7 +17,7 @@ public class RegistrationServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        if (req.getSession().getAttribute("user") == null) {
+        if (req.getSession().getAttribute("uid") == null) {
             req.getRequestDispatcher("registration.jsp").forward(req, resp);
             return;
         }
@@ -39,18 +39,17 @@ public class RegistrationServlet extends HttpServlet {
             return;
         }
 
-        DBService service = (DBService) getServletContext().getAttribute("service");
-        UserProfile userProfile = service.getUser(login);
+        UserService service = (UserService) getServletContext().getAttribute("service");
+        UserProfile user = service.getUser(login);
 
-        if (userProfile != null) {
+        if (user != null) {
             req.setAttribute("error", "This login is already used.");
             req.getRequestDispatcher("registration.jsp").forward(req, resp);
             return;
         }
 
-        UserProfile newUser = new UserProfile(login, password);
-        req.getSession().setAttribute("user", newUser);
-        service.addNewUser(login, password);
+        Long uid = service.addNewUser(login, password);
+        req.getSession().setAttribute("uid", uid);
 
         Files.createDirectories(Paths.get("D:/tmp/filemanager/" + login));
 

@@ -1,5 +1,6 @@
 package com.example.servlets;
 
+import com.example.database.UserService;
 import com.example.models.UserProfile;
 import com.example.models.FileInfo;
 import jakarta.servlet.ServletException;
@@ -27,17 +28,20 @@ public class FilesServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        UserProfile userProfile = (UserProfile) req.getSession().getAttribute("user");
+        Long uid = (Long) req.getSession().getAttribute("uid");
 
-        if (userProfile == null) {
+        if (uid == null) {
             resp.sendRedirect("login");
             return;
         }
 
-        String login = userProfile.getLogin();
+        UserService service = (UserService) getServletContext().getAttribute("service");
+        UserProfile user = service.getUser(uid);
+
+        String login = user.getLogin();
         String userPath = req.getParameter("path");
 
-        if (userPath == null || !userPath.startsWith("D:/tmp/filemanager/" + login)) {
+        if (userPath == null || !userPath.startsWith("D:/tmp/filemanager/" + login) || userPath.contains("..")) {
             resp.sendRedirect("files?path=D:/tmp/filemanager/" + login);
             return;
         }

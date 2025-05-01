@@ -1,6 +1,6 @@
 package com.example.servlets;
 
-import com.example.database.DBService;
+import com.example.database.UserService;
 import com.example.models.UserProfile;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -15,7 +15,7 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        if (req.getSession().getAttribute("user") == null) {
+        if (req.getSession().getAttribute("uid") == null) {
             req.getRequestDispatcher("login.jsp").forward(req, resp);
             return;
         }
@@ -37,12 +37,12 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        DBService service = (DBService) getServletContext().getAttribute("service");
-        UserProfile userProfile = service.getUser(login);
+        UserService service = (UserService) getServletContext().getAttribute("service");
+        UserProfile user = service.getUser(login);
 
-        if (userProfile == null) {
+        if (user == null) {
             req.setAttribute("error", "No such login.");
-        } else if (!userProfile.getPassword().equals(password)) {
+        } else if (!user.getPassword().equals(password)) {
             req.setAttribute("error", "Wrong password.");
         }
 
@@ -51,7 +51,7 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        req.getSession().setAttribute("user", userProfile);
+        req.getSession().setAttribute("uid", user.getId());
 
         resp.sendRedirect("files");
     }

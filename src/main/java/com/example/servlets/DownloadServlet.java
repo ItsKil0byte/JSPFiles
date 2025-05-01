@@ -1,5 +1,6 @@
 package com.example.servlets;
 
+import com.example.database.UserService;
 import com.example.models.UserProfile;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -20,15 +21,18 @@ public class DownloadServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        UserProfile userProfile = (UserProfile) req.getSession().getAttribute("user");
+        Long uid = (Long) req.getSession().getAttribute("uid");
 
-        if (userProfile == null) {
+        if (uid == null) {
             resp.sendRedirect("login");
             return;
         }
 
+        UserService service = (UserService) getServletContext().getAttribute("service");
+        UserProfile user = service.getUser(uid);
+
         Path path;
-        String login = userProfile.getLogin();
+        String login = user.getLogin();
         String userPath = req.getParameter("path");
 
         if (userPath == null || !userPath.startsWith("D:/tmp/filemanager/" + login)) {
