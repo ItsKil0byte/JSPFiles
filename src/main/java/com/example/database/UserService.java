@@ -36,14 +36,7 @@ public class UserService {
     public UserProfile getUser(String login) {
         try (Session session = sessionFactory.openSession()) {
             UsersDAO usersDAO = new UsersDAO(session);
-            UserProfile user = usersDAO.get(login);
-
-            if (user == null) {
-                session.close();
-                return null;
-            }
-
-            return user;
+            return usersDAO.get(login);
         }
     }
 
